@@ -1,0 +1,42 @@
+npm install express mongodb
+
+
+
+const express = require('express');
+const { MongoClient } = require('mongodb');
+
+const app = express();
+const PORT = 3000; // Choose any port you prefer
+
+const mongoURI = 'mongodb://localhost:27017'; // Replace with your MongoDB connection string
+const client = new MongoClient(mongoURI);
+
+// Connect to MongoDB
+async function connectToDB() {
+  try {
+    await client.connect();
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+  }
+}
+connectToDB();
+
+// Define a route to fetch data from your collection
+app.get('/api/user_acc', async (req, res) => {
+  try {
+    const db = client.db('UserDB'); // Replace with your database name
+    const collection = db.collection('user_acc'); // Replace with your collection name
+
+    const data = await collection.find({}).toArray();
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
